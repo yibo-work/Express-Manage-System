@@ -28,16 +28,6 @@
                 </div>
             </div>
             <div class="layui-form-item">
-                <label class="layui-form-label" for="userId">
-                    订单用户id
-                </label>
-                <div class="layui-input-block">
-                    <div class="layui-input-inline layui-show-xs-block">
-                        <div id="userId" style="line-height: 36px" v-text="orderList.userId"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="layui-form-item">
                 <label class="layui-form-label" for="username">
                     收货人姓名
                 </label>
@@ -63,7 +53,7 @@
                 </label>
                 <div class="layui-input-block">
                     <div class="layui-input-inline layui-show-xs-block">
-                        <div id="startExpress" style="line-height: 36px" v-text="orderList.startExpress"></div>
+                        <div id="startExpress" style="line-height: 36px" v-text="orderList.startExpressName"></div>
                     </div>
                 </div>
             </div>
@@ -73,7 +63,7 @@
                 </label>
                 <div class="layui-input-block">
                     <div class="layui-input-inline layui-show-xs-block">
-                        <div id="endExpress" style="line-height: 36px" v-text="orderList.endExpress"></div>
+                        <div id="endExpress" style="line-height: 36px" v-text="orderList.endExpressName"></div>
                     </div>
                 </div>
             </div>
@@ -83,7 +73,7 @@
                 </label>
                 <div class="layui-input-block">
                     <div class="layui-input-inline layui-show-xs-block">
-                        <div id="arriveExpress" style="line-height: 36px" v-text="orderList.arriveExpress"></div>
+                        <div id="arriveExpress" style="line-height: 36px" v-text="orderList.arriveExpressName"></div>
                     </div>
                 </div>
             </div>
@@ -93,7 +83,9 @@
                 </label>
                 <div class="layui-input-block">
                     <div class="layui-input-inline layui-show-xs-block">
-                        <div id="status" style="line-height: 36px" v-text="orderList.status"></div>
+                        <div id="status" style="line-height: 36px" v-if="orderList.status == 0">待提交</div>
+                        <div id="status" style="line-height: 36px" v-if="orderList.status == 1">待收货</div>
+                        <div id="status" style="line-height: 36px" v-if="orderList.status == 2">已完成</div>
                     </div>
                 </div>
             </div>

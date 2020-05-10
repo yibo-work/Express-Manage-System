@@ -9,6 +9,8 @@ import com.utils.RequestParamsUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -72,6 +74,17 @@ public class OrderListServiceImpl implements OrderListService {
      */
     @Override
     public int update(OrderList orderList) {
+        return orderListDao.update(orderList);
+    }
+
+    /**
+     * 修改订单
+     */
+    @Override
+    public int submitOrder(OrderList orderList) {
+        SimpleDateFormat dft = new SimpleDateFormat("yyyyMMddHHmmssSSS");
+        String orderNo = dft.format(new Date());
+        orderList.setOrderNo(orderNo);
         return orderListDao.update(orderList);
     }
 

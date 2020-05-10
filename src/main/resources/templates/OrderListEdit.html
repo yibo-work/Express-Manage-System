@@ -17,27 +17,6 @@
 <div class="layui-fluid" id="vmUpdateOrderList">
     <div class="layui-row">
         <form class="layui-form">
-            <div class="layui-form-item">
-                <label class="layui-form-label" for="orderNo">
-                    <span class="x-red">*</span>订单号
-                </label>
-                <div class="layui-input-block">
-                    <div class="layui-input-inline layui-show-xs-block">
-                        <input class="layui-input" id="orderNo" lay-verify="required" name="orderNo" type="text"
-                               v-model="orderList.orderNo"></div>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label" for="userId">
-                    <span class="x-red">*</span>订单用户id
-                </label>
-                <div class="layui-input-block">
-                    <div class="layui-input-inline layui-show-xs-block">
-                        <input class="layui-input" id="userId" lay-verify="required" name="userId" type="text"
-                               v-model="orderList.userId"></div>
-                </div>
-            </div>
 
             <div class="layui-form-item">
                 <label class="layui-form-label" for="username">
@@ -67,44 +46,24 @@
                 </label>
                 <div class="layui-input-block">
                     <div class="layui-input-inline layui-show-xs-block">
-                        <input class="layui-input" id="startExpress" lay-verify="required" name="startExpress"
-                               type="text" v-model="orderList.startExpress"></div>
+                        <select id="startExpress" lay-verify="required" name="startExpress" v-model="orderList.startExpress">
+                            <option :value="express.id" v-for="express,index in expressList">{{express.name}}</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-
             <div class="layui-form-item">
                 <label class="layui-form-label" for="endExpress">
                     <span class="x-red">*</span>收件人地址（快递点）
                 </label>
                 <div class="layui-input-block">
                     <div class="layui-input-inline layui-show-xs-block">
-                        <input class="layui-input" id="endExpress" lay-verify="required" name="endExpress" type="text"
-                               v-model="orderList.endExpress"></div>
+                        <select id="endExpress" lay-verify="required" name="endExpress"  v-model="orderList.endExpress">
+                            <option :value="express.id" v-for="express,index in expressList">{{express.name}}</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label" for="arriveExpress">
-                    <span class="x-red">*</span>已到达快递点
-                </label>
-                <div class="layui-input-block">
-                    <div class="layui-input-inline layui-show-xs-block">
-                        <input class="layui-input" id="arriveExpress" lay-verify="required" name="arriveExpress"
-                               type="text" v-model="orderList.arriveExpress"></div>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label" for="status">
-                    <span class="x-red">*</span>状态
-                </label>
-                <div class="layui-input-block">
-                    <div class="layui-input-inline layui-show-xs-block">
-                        <input class="layui-input" id="status" lay-verify="required" name="status" type="text"
-                               v-model="orderList.status"></div>
-                </div>
-            </div>
-
 
             <div class="layui-form-item">
                 <label class="layui-form-label"></label>
@@ -122,7 +81,8 @@
     vm = new Vue({
         el: "#vmUpdateOrderList",
         data: {
-            orderList: {}
+            orderList: {},
+            expressList: []
         },
         methods: {},
         created: function () {
@@ -143,6 +103,18 @@
                 }
             });
 
+            $.ajax({
+                url: "/user/list?roleId=2",
+                dataType: "json",
+                type: "get",
+                success: function (result) {
+                    if (result.code === 200) {
+                        _this.expressList = result.data;
+                    } else {
+                        layer.alert("获取所有快递点信息失败！");
+                    }
+                }
+            });
         }
     });
 
@@ -158,6 +130,12 @@
 
                     //组装数据
                     data.field.id = editOrderListId;
+
+                    var phone = data.field.phone;
+                    if (!(/^1(3|4|5|6|7|8|9)\d{9}$/.test(phone))) {
+                        layer.alert("手机号码有误，请重填");
+                        return false;
+                    }
 
                     //发异步，把数据提交给controller
                     $.ajax({

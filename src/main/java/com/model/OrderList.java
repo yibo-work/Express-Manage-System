@@ -7,10 +7,11 @@ import java.util.Date;
 
 /**
  * 订单
+ *
  * @author Clrvn
  */
 @Data
-public class OrderList implements Serializable{
+public class OrderList implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -48,16 +49,19 @@ public class OrderList implements Serializable{
      * 寄件人地址（快递点）
      */
     private Integer startExpress;
+    private String startExpressName;
 
     /**
      * 收件人地址（快递点）
      */
     private Integer endExpress;
+    private String endExpressName;
 
     /**
      * 已到达快递点
      */
     private Integer arriveExpress;
+    private String arriveExpressName;
 
     /**
      * 状态

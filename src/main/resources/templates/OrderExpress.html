@@ -45,11 +45,6 @@
                         </div>
                     </form>
                 </div>
-                <div class="layui-card-header">
-                    <button class="layui-btn" onclick="xadmin.open('添加订单','/orderListAdd',500,600)">
-                        <i class="layui-icon"></i>添加订单
-                    </button>
-                </div>
                 <div class="layui-card-body">
                     <table class="layui-table layui-form">
                         <thead>
@@ -60,9 +55,7 @@
                             <th>收货人电话</th>
                             <th>寄件人地址（快递点）</th>
                             <th>收件人地址（快递点）</th>
-                            <th>已到达快递点</th>
-                            <th>状态</th>
-                            <th>创建时间</th>
+                            <th>下单时间</th>
                             <th>操作</th>
                         </tr>
                         </thead>
@@ -70,37 +63,26 @@
                         <tr v-for="orderList,i in pageInfo.list">
                             <td v-text="i+1"></td>
                             <td v-text="orderList.orderNo"></td>
-                            <td v-text="orderList.username"></td>
-                            <td v-text="orderList.phone"></td>
-                            <td v-text="orderList.startExpressName"></td>
-                            <td v-text="orderList.endExpressName"></td>
-                            <td v-text="orderList.arriveExpressName"></td>
-                            <td style="color: #1E9FFF" v-if="orderList.status == 0">待提交</td>
-                            <td style="color: #9dff9e" v-if="orderList.status == 1">待收货</td>
-                            <td style="color: #90c5ff" v-if="orderList.status == 2">已完成</td>
+                            <td v-if="orderList.endExpress == orderList.arriveExpress" v-text="orderList.username"></td>
+                            <td v-else></td>
+                            <td v-if="orderList.endExpress == orderList.arriveExpress" v-text="orderList.phone"></td>
+                            <td v-else></td>
+                            <td v-if="orderList.endExpress == orderList.arriveExpress"
+                                v-text="orderList.startExpressName"></td>
+                            <td v-else></td>
+                            <td v-if="orderList.endExpress == orderList.arriveExpress"
+                                v-text="orderList.endExpressName"></td>
+                            <td v-else></td>
                             <td v-text="orderList.createTime"></td>
                             <td class="td-manage">
-                                <button @click="editOrderList(orderList.id)"
-                                        class="layui-btn layui-btn-warm"
-                                        id="editOrderList"
-                                        onclick="xadmin.open('编辑订单','/orderListEdit',500,600)"
-                                        v-if="orderList.status == 0">
-                                    <i class="layui-icon">&#xe631;</i>编辑
+                                <button @click="finishOrder(orderList.id)" class="layui-btn layui-btn-primary"
+                                        v-if="orderList.endExpress == orderList.arriveExpress">
+                                    <i class="layui-icon layui-icon-ok"></i>执行电话通知派送
                                 </button>
-                                <button @click="viewOrderList(orderList.id)"
-                                        class="layui-btn"
-                                        id="viewOrderList"
-                                        onclick="xadmin.open('订单详情','/orderListView',500,600)">
-                                    <i class="layui-icon layui-icon-console"></i>详情
-                                </button>
-                                <button @click="submitOrder(orderList.id)" class="layui-btn layui-btn-primary"
-                                        v-if="orderList.status==0">
-                                    <i class="layui-icon layui-icon-ok"></i>提交
-                                </button>
-                                <button @click="delOrderList(orderList.id)"
-                                        class="layui-btn layui-btn-danger"
-                                        id="delOrderList" v-if="orderList.status == 0">
-                                    <i class="layui-icon">&#xe640;</i>删除
+                                <button @click="continueOrder(JSON.stringify(orderList))"
+                                        class="layui-btn layui-btn-primary"
+                                        v-if="orderList.endExpress != orderList.arriveExpress">
+                                    <i class="layui-icon layui-icon-ok"></i>已到达下一站点
                                 </button>
                             </td>
                         </tr>
@@ -157,7 +139,8 @@
                     url += "&pageSize=" + pageSize;
                 }
 
-                url += "&userId=" + sessionUser.id;
+                url += "&status=1";
+                url += "&arriveExpress=" + sessionUser.id;
 
                 if (orderNo && orderNo.trim().length > 0) {
                     url += "&orderNo=" + orderNo;
@@ -169,23 +152,23 @@
             /**
              * 提交订单
              */
-            submitOrder: function (id) {
-                layer.confirm('确认要提交订单吗？',
+            finishOrder: function (id) {
+                layer.confirm('确认要执行电话通知派送吗？',
                     function () {
                         var orderList = {};
                         orderList.id = id;
-                        orderList.status = 1;
+                        orderList.status = 2;
 
                         //发异步删除数据
                         $.ajax({
-                            url: "/orderList/submitOrder",
+                            url: "/orderList/update",
                             data: JSON.stringify(orderList),
                             dataType: "json",
                             contentType: "application/json",
                             type: "put",
                             success: function (result) {
                                 if (result.code === 200) {
-                                    layer.msg('提交成功', {
+                                    layer.msg('电话通知派送成功', {
                                         icon: 1,
                                         time: 1000
                                     });
@@ -201,22 +184,29 @@
                     });
             },
             /**
-             * 删除订单
+             * 继续订单
              */
-            delOrderList: function (id) {
-                layer.confirm('确认要删除吗？',
+            continueOrder: function (orderListStr) {
+                layer.confirm('确认已到达下一站点吗？',
                     function () {
+                        var orderList = JSON.parse(orderListStr);
+
+                        if (orderList.startExpress > orderList.endExpress) {
+                            orderList.arriveExpress = orderList.arriveExpress - 1;
+                        } else {
+                            orderList.arriveExpress = orderList.arriveExpress + 1;
+                        }
+
                         //发异步删除数据
                         $.ajax({
-                            url: "/orderList/deleteById",
-                            data: {
-                                id: id
-                            },
+                            url: "/orderList/update",
+                            data: JSON.stringify(orderList),
                             dataType: "json",
-                            type: "delete",
+                            contentType: "application/json",
+                            type: "put",
                             success: function (result) {
                                 if (result.code === 200) {
-                                    layer.msg('删除成功', {
+                                    layer.msg('点击到达下一站点成功', {
                                         icon: 1,
                                         time: 1000
                                     });
@@ -230,22 +220,6 @@
                         });
 
                     });
-            },
-            /**
-             *
-             * 修改订单
-             */
-            editOrderList: function (editOrderListId) {
-                //把要修改的editOrderListId存到sessionStorage中
-                sessionStorage.setItem("editOrderListId", editOrderListId);
-            },
-            /**
-             *
-             * 订单详情
-             */
-            viewOrderList: function (viewOrderListId) {
-                //把要修改的viewOrderListId存到sessionStorage中
-                sessionStorage.setItem("viewOrderListId", viewOrderListId);
             }
         },
         created: function () {

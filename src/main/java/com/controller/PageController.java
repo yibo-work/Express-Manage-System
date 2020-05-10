@@ -109,5 +109,10 @@ public class PageController {
         return "orderListView";
     }
 
+    @GetMapping("/orderExpress")
+    public String orderExpress() {
+        return "OrderExpress";
+    }
+
 
 }

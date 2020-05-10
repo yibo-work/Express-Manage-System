@@ -51,4 +51,5 @@ public interface OrderListService {
      */
     int deleteById(Integer id);
 
+    int submitOrder(OrderList orderList);
 }

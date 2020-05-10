@@ -4,31 +4,52 @@
 <mapper namespace="com.dao.OrderListDao">
 
     <select id="findById" resultType="com.model.OrderList">
-        select `id`,
+        select a.`id`,
                `order_no`,
                `user_id`,
                `goods`,
                `username`,
-               `phone`,
+               a.`phone`,
                `start_express`,
+               d.name as `start_express_name`,
                `end_express`,
+               f.name as `end_express_name`,
                `arrive_express`,
+               g.name as `arrive_express_name`,
                `status`,
                `create_time`
-        from order_list
-        where id = #{id}
+        from order_list a
+                 left join user d ON d.id = a.start_express
+                 left join user f ON f.id = a.end_express
+                 left join user g ON g.id = a.arrive_express
+        where a.id = #{id}
     </select>
 
     <select id="findByMap" resultType="com.model.OrderList">
-        select
-        `id`,`order_no`,`user_id`,`goods`,`username`,`phone`,`start_express`,`end_express`,`arrive_express`,`status`,`create_time`
-        from order_list
+        select a.`id`,
+        `order_no`,
+        `user_id`,
+        `goods`,
+        `username`,
+        a.`phone`,
+        `start_express`,
+        d.name as `start_express_name`,
+        `end_express`,
+        f.name as `end_express_name`,
+        `arrive_express`,
+        g.name as `arrive_express_name`,
+        `status`,
+        `create_time`
+        from order_list a
+        left join user d ON d.id = a.start_express
+        left join user f ON f.id = a.end_express
+        left join user g ON g.id = a.arrive_express
         <where>
             <if test="id != null and id != ''">
-                and id = #{id}
+                and a.id = #{id}
             </if>
             <if test="orderNo != null and orderNo != ''">
-                and order_no = #{orderNo}
+                and order_no like concat('%',#{orderNo},'%')
             </if>
             <if test="userId != null and userId != ''">
                 and user_id = #{userId}
@@ -40,7 +61,7 @@
                 and username = #{username}
             </if>
             <if test="phone != null and phone != ''">
-                and phone = #{phone}
+                and a.phone = #{phone}
             </if>
             <if test="startExpress != null and startExpress != ''">
                 and start_express = #{startExpress}
@@ -54,51 +75,62 @@
             <if test="status != null and status != ''">
                 and status = #{status}
             </if>
-            <if test="createTime != null and createTime != ''">
-                and create_time = #{createTime}
-            </if>
         </where>
+        order by create_time desc
     </select>
 
     <select id="list" resultType="com.model.OrderList">
-        select
-        `id`,`order_no`,`user_id`,`goods`,`username`,`phone`,`start_express`,`end_express`,`arrive_express`,`status`,`create_time`
-        from order_list
+        select a.`id`,
+        `order_no`,
+        `user_id`,
+        `goods`,
+        `username`,
+        a.`phone`,
+        `start_express`,
+        d.name as `start_express_name`,
+        `end_express`,
+        f.name as `end_express_name`,
+        `arrive_express`,
+        g.name as `arrive_express_name`,
+        `status`,
+        `create_time`
+        from order_list a
+        left join user d ON d.id = a.start_express
+        left join user f ON f.id = a.end_express
+        left join user g ON g.id = a.arrive_express
         <where>
-            <if test="id != null and id != ''">and id =
-                #{id}
+            <if test="id != null and id != ''">
+                and a.id = #{id}
             </if>
-            <if test="orderNo != null and orderNo != ''">and order_no =
-                #{orderNo}
+            <if test="orderNo != null and orderNo != ''">
+                and order_no like concat('%',#{orderNo},'%')
             </if>
-            <if test="userId != null and userId != ''">and user_id =
-                #{userId}
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
             </if>
-            <if test="goods != null and goods != ''">and goods =
-                #{goods}
+            <if test="goods != null and goods != ''">
+                and goods = #{goods}
             </if>
-            <if test="username != null and username != ''">and username =
-                #{username}
+            <if test="username != null and username != ''">
+                and username = #{username}
             </if>
-            <if test="phone != null and phone != ''">and phone =
-                #{phone}
+            <if test="phone != null and phone != ''">
+                and a.phone = #{phone}
             </if>
-            <if test="startExpress != null and startExpress != ''">and start_express =
-                #{startExpress}
+            <if test="startExpress != null and startExpress != ''">
+                and start_express = #{startExpress}
             </if>
-            <if test="endExpress != null and endExpress != ''">and end_express =
-                #{endExpress}
+            <if test="endExpress != null and endExpress != ''">
+                and end_express = #{endExpress}
             </if>
-            <if test="arriveExpress != null and arriveExpress != ''">and arrive_express =
-                #{arriveExpress}
+            <if test="arriveExpress != null and arriveExpress != ''">
+                and arrive_express = #{arriveExpress}
             </if>
-            <if test="status != null and status != ''">and status =
-                #{status}
-            </if>
-            <if test="createTime != null and createTime != ''">and create_time =
-                #{createTime}
+            <if test="status != null and status != ''">
+                and status = #{status}
             </if>
         </where>
+        order by create_time desc
     </select>
 
     <insert id="save" parameterType="com.model.OrderList" useGeneratedKeys="true" keyProperty="id">
@@ -161,8 +193,6 @@
             </if>
             <if test="status != null">`status` = #{status}
                 ,
-            </if>
-            <if test="createTime != null">`create_time` = #{createTime}
             </if>
         </set>
         where id = #{id}

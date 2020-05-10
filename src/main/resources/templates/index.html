@@ -35,7 +35,7 @@
                     th:text="${session.USER.name}">admin</span></a>
             <dl class="layui-nav-child">
                 <dd>
-                    <a  onclick="xadmin.open('修改密码','/editPassword',500,300)">修改密码</a></dd>
+                    <a onclick="xadmin.open('修改密码','/editPassword',500,300)">修改密码</a></dd>
                 <dd>
                     <a th:href="@{/loginOut}">退出</a></dd>
             </dl>
@@ -48,7 +48,7 @@
 <div class="left-nav">
     <div id="side-nav">
         <ul class="active" id="nav">
-            <li class="open" th:if="${session.USER.roleId != 3}">
+            <li class="open" th:if="${session.USER.roleId == 1}">
                 <a href="javascript:void(0)">
                     <i class="iconfont left-nav-li" lay-tips="订单管理">&#xe726;</i>
                     <cite>订单管理</cite>
@@ -58,6 +58,19 @@
                         <a onclick="xadmin.add_tab('订单管理','orderListManage')">
                             <i class="iconfont">&#xe6a7;</i>
                             <cite>订单管理</cite></a>
+                    </li>
+                </ul>
+            </li>
+            <li class="open" th:if="${session.USER.roleId == 2}">
+                <a href="javascript:void(0)">
+                    <i class="iconfont left-nav-li" lay-tips="订单派送">&#xe726;</i>
+                    <cite>订单派送</cite>
+                    <i class="iconfont nav_right">&#xe697;</i></a>
+                <ul class="sub-menu" style="display: block;">
+                    <li>
+                        <a onclick="xadmin.add_tab('订单管理','orderExpress')">
+                            <i class="iconfont">&#xe6a7;</i>
+                            <cite>订单派送</cite></a>
                     </li>
                 </ul>
             </li>

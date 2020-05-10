@@ -79,6 +79,15 @@ public class OrderListController {
     }
 
     /**
+     * 提交订单
+     */
+    @PutMapping("/submitOrder")
+    public ResultVO submitOrder(@RequestBody OrderList orderList) {
+        orderListService.submitOrder(orderList);
+        return ResultVOUtil.success();
+    }
+
+    /**
      * 删除订单
      */
     @DeleteMapping("/deleteById")
